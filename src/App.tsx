@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import nsidcLogo from '/nsidc-logo.svg'
+
+import nsidcLogo from './assets/nsidc-logo.svg'
 import './App.css'
 
 function App() {
