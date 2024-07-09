@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 import nsidcLogo from './assets/nsidc-logo.svg'
 import './App.css'
 
