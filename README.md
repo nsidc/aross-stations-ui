@@ -15,6 +15,21 @@ data on a map and bar charts.
 _Part of the [AROSS Stations](https://github.com/nsidc/aross-stations) project._
 
 
+## Usage
+
+Required [Docker](https://docs.docker.com/engine/install/) for quickstart. For
+development, requires [NodeJS](https://nodejs.org/en) >=20.
+
+
+### Starting the UI
+
+```bash
+docker compose up --detach
+```
+
+Visit the running application at `http://localhost:80`.
+
+
 <!-- prettier-ignore-start -->
 [actions-badge]:            https://github.com/nsidc/aross-stations-ui/workflows/CI/badge.svg
 [actions-link]:             https://github.com/nsidc/aross-stations-ui/actions

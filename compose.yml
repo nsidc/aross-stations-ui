@@ -1,0 +1,7 @@
+services:
+  ui:
+    image: "ghcr.io/nsidc/aross-stations-ui:dev"
+    # TODO: Build is only for dev!
+    build: "."
+    ports:
+      - "80:80"
