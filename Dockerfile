@@ -4,7 +4,7 @@ WORKDIR /tmp
 
 # Install dependencies
 COPY package*.json ./
-RUN npm clean-install --production
+RUN npm clean-install
 
 # Build
 COPY . .
