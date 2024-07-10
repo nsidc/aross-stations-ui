@@ -12,4 +12,4 @@ services:
     volumes:
       - "./src:/app/src:ro"
       - "./index.html:/app/index.html:ro"
-      - "./.eslintrc.js:/app/.eslintrc.js:ro"
+      - "./.eslintrc.cjs:/app/.eslintrc.cjs:ro"
