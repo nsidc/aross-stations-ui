@@ -11,6 +11,7 @@ on:
 jobs:
 
   test:
+    name: "Continuous Integration"
     uses: "./.github/workflows/ci.yml"
 
   # When a push to the default branch occurs, build and release "latest" images
