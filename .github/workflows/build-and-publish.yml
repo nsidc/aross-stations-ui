@@ -1,0 +1,51 @@
+name: "Publish container image"
+
+on:
+  push:
+    branches:
+      - "main"
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+
+
+jobs:
+
+  test:
+    uses: "./.github/workflows/ci.yml"
+
+  # When a push to the default branch occurs, build and release "latest" images
+  # When a tag `vX.Y.Z` push occurs, build and release images with that tag
+  build-and-publish-image:
+    name: "Build and publish container image"
+    needs:
+      - "test"
+    uses: "nsidc/.github/.github/workflows/build-and-publish-container-image.yml@main"
+    secrets: "inherit"
+
+  publish-to-npmjs:
+    name: "Build & publish"
+    if: "startsWith(github.ref, 'refs/tags/v')"
+    needs:
+      - "test"
+    runs-on: "ubuntu-latest"
+    steps:
+
+      - name: "Check out repository"
+        uses: "actions/checkout@v4"
+
+      - name: "Setup NodeJS"
+        uses: "actions/setup-node@v4"
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: "Install dependencies"
+        run: "npm clean-install"
+
+      - name: "Build"
+        run: "npm run build"
+
+      - name: "Publish to npmjs.com"
+        run: "npm publish --access public"
+        env:
+          NODE_AUTH_TOKEN: "${{secrets.NPM_DEPLOY_TOKEN}}"

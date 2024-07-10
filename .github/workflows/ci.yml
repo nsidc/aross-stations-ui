@@ -2,10 +2,13 @@ name: Continuous Integration
 
 on:
   workflow_dispatch:
+  # Enable running this workflow from the container build workflow:
+  workflow_call:
   pull_request:
-  push:
-    branches:
-      - main
+  # NOTE: The tests will be run on the main branch as part of the container build workflow.
+  # push:
+  #   branches:
+  #     - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
