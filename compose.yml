@@ -1,7 +1,6 @@
 services:
   ui:
-    image: "ghcr.io/nsidc/aross-stations-ui:dev"
-    # TODO: Build is only for dev!
-    build: "."
+    # TODO: Real tag
+    image: "ghcr.io/nsidc/aross-stations-ui:latest"
     ports:
       - "80:80"

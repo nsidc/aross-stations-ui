@@ -1,3 +1,5 @@
+compose.override.yml
+
 # Logs
 logs
 *.log

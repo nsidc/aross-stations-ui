@@ -1,0 +1,15 @@
+services:
+  ui:
+    build:
+      context: "."
+      target: "builder"
+      args:
+        - "env=dev"
+    restart: "on-failure"
+    ports:
+      # Vite dev server's default port
+      - "5173:5173"
+    volumes:
+      - "./src:/app/src:ro"
+      - "./index.html:/app/index.html:ro"
+      - "./.eslintrc.js:/app/.eslintrc.js:ro"

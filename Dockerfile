@@ -1,6 +1,6 @@
 FROM node:22 as builder
 
-WORKDIR /tmp
+WORKDIR /app
 
 # Install dependencies
 COPY package*.json ./
@@ -8,10 +8,19 @@ RUN npm clean-install
 
 # Build
 COPY . .
-RUN npm run build
+
+ARG env="production"
+RUN if [ "$env" = "production" ]; then \
+  npm run build; \
+fi
+
+# These lines are only required to use this stage of the build to run a dev
+# server (see compose.dev.yml).
+EXPOSE 5173
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 
 
 # Run the built app in a webserver
 FROM nginx
 
-COPY --from=builder /tmp/dist /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
