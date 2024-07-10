@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": "./",
     "paths": {
       "@src/*": ["./src/*"]
     },
@@ -10,7 +11,11 @@
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "noEmit": true
+    "noEmit": true,
+
+    /* Added to make the vite template build */
+    "jsx": "react-jsx",
+    "allowImportingTsExtensions": true
   },
   "include": ["vite.config.ts", "src"]
 }
