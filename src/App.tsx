@@ -1,5 +1,5 @@
-import nsidcLogo from './assets/nsidc-logo.svg'
-import './App.css'
+import nsidcLogo from '@src/assets/nsidc-logo.svg'
+import '@src/App.css'
 
 function App() {
   return (
