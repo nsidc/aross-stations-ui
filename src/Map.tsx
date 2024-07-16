@@ -5,7 +5,7 @@ import { useMap } from '@src/map';
 
 
 export const Map = () => {
-	useMap();
+  useMap();
 
   return (
     <div id="map" style={{ width: '100vw', height: '100vh' }}>
