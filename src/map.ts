@@ -16,6 +16,8 @@ import { BASEMAP } from '@src/basemap';
 import { PROJECTION } from '@src/projection';
 
 const EVENT_COUNT_FIELD_NAME = 'matching_rain_on_snow_event_count';
+const EVENT_SCALE_MIN = 10;
+const EVENT_SCALE_MAX = 1000;
 
 export const useMap = () => { useEffect(() => {
   /////////
@@ -37,18 +39,18 @@ export const useMap = () => { useEffect(() => {
         'interpolate',
         ['linear'],
         ['get', EVENT_COUNT_FIELD_NAME],
-        2000,
+        EVENT_SCALE_MIN,
         3,
-        10000,
+        EVENT_SCALE_MAX,
         10,
       ],
       'circle-fill-color': [
         'interpolate',
         ['linear'],
         ['get', EVENT_COUNT_FIELD_NAME],
-        2000,
+        EVENT_SCALE_MIN,
         'hsl(210 100% 40% / 0.9)',
-        10000,
+        EVENT_SCALE_MAX,
         'hsl(0 80% 60% / 0.9)',
       ],
     },
