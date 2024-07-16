@@ -85,6 +85,8 @@ export const useMap = () => { useEffect(() => {
 
   const featureText = (feature: OlFeatureLike) => {
     return `<strong>${feature.get("name") as string}</strong>
+    <br/>
+    Elevation: ${String(feature.get('elevation_meters'))} meters
     <hr/>
     Matching rain on snow events: ${feature.get(EVENT_COUNT_FIELD_NAME) as string}`;
   };
