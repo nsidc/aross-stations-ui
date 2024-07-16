@@ -1,15 +1,20 @@
-import nsidcLogo from '@src/assets/nsidc-logo.svg'
-import '@src/App.css'
+import {useState} from 'react';
 
-const App = () => (
-  <>
-    <div>
-      <a href="https://nsidg.org" target="_blank" rel="noreferrer">
-        <img src={nsidcLogo} className="logo nsidc" alt="NSIDC logo" />
-      </a>
-    </div>
-    <h1>Arctic Rain on Snow Study (AROSS) - Automated Surface Observation Station (ASOS) Events Database</h1>
-  </>
-);
+import {Splash} from '@src/Splash.tsx'
+import {Map} from '@src/Map.tsx'
+
+
+const App = () => {
+  const [splash, setSplash] = useState<boolean>(true);
+
+  const SplashComponent = <Splash onButton={() => {setSplash(false)}} />;
+  const VisibleComponent = splash ? SplashComponent : <Map />;
+
+  return (
+    <>
+      {VisibleComponent}
+    </>
+  );
+};
 
 export default App

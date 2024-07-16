@@ -14,6 +14,10 @@ data on a map and bar charts.
 
 _Part of the [AROSS Stations](https://github.com/nsidc/aross-stations) project._
 
+> [!IMPORTANT]
+> The [database and API](https://github.com/nsidc/aross-stations-db) must be running on
+> `localhost`.
+
 
 ## Usage
 
@@ -24,7 +28,7 @@ development, requires [NodeJS](https://nodejs.org/en) >=20.
 ### Starting the UI
 
 ```bash
-docker compose up --detach
+docker compose up --pull=always --detach
 ```
 
 Visit the running application at `http://localhost:80`.

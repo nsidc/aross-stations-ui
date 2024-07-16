@@ -7,7 +7,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
+    project: ['./tsconfig.json', './tsconfig.node.json', './tsconfig.app.json'],
     tsconfigRootDir: __dirname,
   },
 
@@ -18,6 +18,7 @@ module.exports = {
     'import',
     'flowtype',
     'jsx-a11y',
+    '@stylistic',
     // 'jest',
     // 'testing-library',
 
@@ -116,6 +117,9 @@ module.exports = {
     // ],  // default "error"
     'no-useless-constructor': 'off',
     // '@typescript-eslint/no-useless-constructor': 'warn',  // default "error"
+    
+    '@stylistic/no-tabs': 'error',
+
 
     /*
     // migrated from:
