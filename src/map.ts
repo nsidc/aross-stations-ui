@@ -15,7 +15,7 @@ import type OlMapBrowserEvent from 'ol/MapBrowserEvent';
 import { BASEMAP } from '@src/basemap';
 import { PROJECTION } from '@src/projection';
 
-const EVENT_COUNT_FIELD_NAME = 'matching_event_count';
+const EVENT_COUNT_FIELD_NAME = 'matching_rain_on_snow_event_count';
 
 export const useMap = () => { useEffect(() => {
   /////////
@@ -83,7 +83,7 @@ export const useMap = () => { useEffect(() => {
   const featureText = (feature: OlFeatureLike) => {
     return `<strong>${feature.get("name") as string}</strong>
     <hr/>
-    Matching events: ${feature.get(EVENT_COUNT_FIELD_NAME) as string}`;
+    Matching rain on snow events: ${feature.get(EVENT_COUNT_FIELD_NAME) as string}`;
   };
 
   const displayFeatureInfo = function (pixel: OlPixel, target: Element) {
