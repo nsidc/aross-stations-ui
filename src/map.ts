@@ -2,6 +2,7 @@ import {useEffect} from 'react';
 
 import OlMap from 'ol/Map';
 import {defaults as defaultControls, MousePosition} from 'ol/control';
+import OlDraw from 'ol/interaction/Draw';
 import OlGeoJSON from 'ol/format/GeoJSON';
 import OlTileLayer from 'ol/layer/Tile';
 import {Pixel as OlPixel} from 'ol/pixel';
@@ -17,6 +18,8 @@ import { PROJECTION } from '@src/projection';
 const EVENT_COUNT_FIELD_NAME = 'matching_event_count';
 
 export const useMap = () => { useEffect(() => {
+  /////////
+  // Layers
   const basemap = new OlTileLayer({
     source: BASEMAP,
   });
@@ -51,9 +54,14 @@ export const useMap = () => { useEffect(() => {
     },
   });
 
+  const drawAPolygonSource = new OlVectorSource({wrapX: false});
+  const drawAPolygonLayer = new OlVectorLayer({source: drawAPolygonSource});
+
+  //////
+  // Map
   const map = new OlMap({
     target: 'map',
-    layers: [basemap, stationsLayer],
+    layers: [basemap, stationsLayer, drawAPolygonLayer],
     view: new OlView({
       projection: PROJECTION,
       extent: PROJECTION.getExtent(),
@@ -64,7 +72,9 @@ export const useMap = () => { useEffect(() => {
     controls: defaultControls().extend([new MousePosition()]),
   }); 
 
-  // Tooltip code based on OpenLayers example: https://openlayers.org/en/latest/examples/tooltip-on-hover.html
+  //////////////////////////////////////////////////////////////////////
+  // Tooltip code based on OpenLayers example:
+  //     https://openlayers.org/en/latest/examples/tooltip-on-hover.html
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const mapTooltipElement = document.getElementById('map-tooltip')!;
 
@@ -75,10 +85,15 @@ export const useMap = () => { useEffect(() => {
     <hr/>
     Matching events: ${feature.get(EVENT_COUNT_FIELD_NAME) as string}`;
   };
+
   const displayFeatureInfo = function (pixel: OlPixel, target: Element) {
     const feature = target.closest('.ol-control')
       ? undefined
-      : map.forEachFeatureAtPixel(pixel,  (feature) => feature);
+      : map.forEachFeatureAtPixel(
+        pixel,
+        (feature) => feature,
+        {layerFilter: (layer) => layer === stationsLayer}
+      );
     if (feature) {
       mapTooltipElement.style.left = `${pixel[0].toString()}px`;
       mapTooltipElement.style.top = `${pixel[1].toString()}px`;
@@ -102,6 +117,14 @@ export const useMap = () => { useEffect(() => {
     // TODO: 
     displayFeatureInfo(pixel, evt.originalEvent.target as Element);
   });
+
+  /////////////////
+  // Draw a polygon
+  const draw = new OlDraw({
+    source: drawAPolygonSource,
+    type: "Polygon",
+  });
+  map.addInteraction(draw);
 
   return () => {map.setTarget(undefined)};
 }, []); };
