@@ -14,6 +14,10 @@ data on a map and bar charts.
 
 _Part of the [AROSS Stations](https://github.com/nsidc/aross-stations) project._
 
+> [!IMPORTANT]
+> The [database and API](https://github.com/nsidc/aross-stations-db) must be running on
+> `localhost`.
+
 
 ## Usage
 
