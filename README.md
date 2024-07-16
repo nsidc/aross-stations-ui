@@ -24,7 +24,7 @@ development, requires [NodeJS](https://nodejs.org/en) >=20.
 ### Starting the UI
 
 ```bash
-docker compose up --detach
+docker compose up --pull=always --detach
 ```
 
 Visit the running application at `http://localhost:80`.
