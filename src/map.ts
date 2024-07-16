@@ -14,6 +14,7 @@ import type OlMapBrowserEvent from 'ol/MapBrowserEvent';
 
 import { BASEMAP } from '@src/basemap';
 import { PROJECTION } from '@src/projection';
+import { API_STATIONS_QUERY_URL } from '@src/api';
 
 const EVENT_COUNT_FIELD_NAME = 'matching_rain_on_snow_event_count';
 const EVENT_SCALE_MIN = 10;
@@ -29,7 +30,7 @@ export const useMap = () => { useEffect(() => {
   const stationsLayer = new OlVectorLayer({
     source: new OlVectorSource({
       format: new OlGeoJSON(),
-      url: 'http://localhost:8000/v1/stations/?start=2000-01-01&end=2024-01-01',
+      url: API_STATIONS_QUERY_URL,
     }),
     // @ts-ignore: Allow lists for circle-radius and circle-fill-color
     style: {
