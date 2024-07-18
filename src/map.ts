@@ -14,8 +14,11 @@ import type OlMapBrowserEvent from 'ol/MapBrowserEvent';
 
 import { BASEMAP } from '@src/basemap';
 import { PROJECTION } from '@src/projection';
+import { API_STATIONS_QUERY_URL } from '@src/api';
 
-const EVENT_COUNT_FIELD_NAME = 'matching_event_count';
+const EVENT_COUNT_FIELD_NAME = 'matching_rain_on_snow_event_count';
+const EVENT_SCALE_MIN = 10;
+const EVENT_SCALE_MAX = 1000;
 
 export const useMap = () => { useEffect(() => {
   /////////
@@ -27,7 +30,7 @@ export const useMap = () => { useEffect(() => {
   const stationsLayer = new OlVectorLayer({
     source: new OlVectorSource({
       format: new OlGeoJSON(),
-      url: 'http://localhost:8000/v1/stations/?start=2000-01-01&end=2024-01-01',
+      url: API_STATIONS_QUERY_URL,
     }),
     // @ts-ignore: Allow lists for circle-radius and circle-fill-color
     style: {
@@ -37,18 +40,18 @@ export const useMap = () => { useEffect(() => {
         'interpolate',
         ['linear'],
         ['get', EVENT_COUNT_FIELD_NAME],
-        2000,
+        EVENT_SCALE_MIN,
         3,
-        10000,
+        EVENT_SCALE_MAX,
         10,
       ],
       'circle-fill-color': [
         'interpolate',
         ['linear'],
         ['get', EVENT_COUNT_FIELD_NAME],
-        2000,
+        EVENT_SCALE_MIN,
         'hsl(210 100% 40% / 0.9)',
-        10000,
+        EVENT_SCALE_MAX,
         'hsl(0 80% 60% / 0.9)',
       ],
     },
@@ -82,8 +85,10 @@ export const useMap = () => { useEffect(() => {
 
   const featureText = (feature: OlFeatureLike) => {
     return `<strong>${feature.get("name") as string}</strong>
+    <br/>
+    Elevation: ${String(feature.get('elevation_meters'))} meters
     <hr/>
-    Matching events: ${feature.get(EVENT_COUNT_FIELD_NAME) as string}`;
+    Matching rain on snow events: ${feature.get(EVENT_COUNT_FIELD_NAME) as string}`;
   };
 
   const displayFeatureInfo = function (pixel: OlPixel, target: Element) {
