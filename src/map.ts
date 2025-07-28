@@ -3,14 +3,20 @@ import {useEffect} from 'react';
 import OlMap from 'ol/Map';
 import {defaults as defaultControls, MousePosition} from 'ol/control';
 import OlDraw from 'ol/interaction/Draw';
+import { click } from 'ol/events/condition';
+import Select from 'ol/interaction/Select';
 import OlGeoJSON from 'ol/format/GeoJSON';
 import OlTileLayer from 'ol/layer/Tile';
 import {Pixel as OlPixel} from 'ol/pixel';
 import {FeatureLike as OlFeatureLike} from 'ol/Feature';
+import {Extent} from 'ol/extent';
 import OlVectorLayer from 'ol/layer/Vector';
 import OlVectorSource from 'ol/source/Vector'; 
 import OlView from 'ol/View.js';
 import type OlMapBrowserEvent from 'ol/MapBrowserEvent';
+import {type DrawEvent as OlDrawEvent} from 'ol/interaction/Draw';
+
+import $ from 'jquery';
 
 import { BASEMAP } from '@src/basemap';
 import { PROJECTION } from '@src/projection';
@@ -60,6 +66,7 @@ export const useMap = () => { useEffect(() => {
   const drawAPolygonSource = new OlVectorSource({wrapX: false});
   const drawAPolygonLayer = new OlVectorLayer({source: drawAPolygonSource});
 
+
   //////
   // Map
   const map = new OlMap({
@@ -82,6 +89,7 @@ export const useMap = () => { useEffect(() => {
   const mapTooltipElement = document.getElementById('map-tooltip')!;
 
   let currentFeature: OlFeatureLike | undefined;
+  let canToggle: boolean = true;
 
   const featureText = (feature: OlFeatureLike) => {
     return `<strong>${feature.get("name") as string}</strong>
@@ -123,13 +131,99 @@ export const useMap = () => { useEffect(() => {
     displayFeatureInfo(pixel, evt.originalEvent.target as Element);
   });
 
+  ////////////////////////
+  // Toggle Polygon Button
+  const toggleOn = (btn: JQuery) => {
+    btn.removeClass('toggle-off');
+    btn.addClass('toggle-on');
+    map.removeInteraction(select);
+    map.addInteraction(draw);
+  };
+
+  const toggleOff = (btn: JQuery) => {
+    btn.removeClass('toggle-on');
+    btn.addClass('toggle-off');
+    map.removeInteraction(draw);
+    map.addInteraction(select);
+  };
+
+  const select = new Select({
+    condition: click,
+  });
+
+  map.addInteraction(select);
+
+  const selectedFeatures = select.getFeatures();
+
+  const showOrHideDownloadButton = function() {
+    const btn : JQuery = $('#map-download-btn');
+    const numSelected = selectedFeatures.getLength();
+    if (numSelected === 0) {
+      btn.hide();
+    } else {
+      btn.html('Download Data for ' + String(numSelected) + ' Stations');
+      btn.show();
+    }
+  }
+
+  select.on('select', showOrHideDownloadButton);
+
+  const togglePolygon = $('#map-toggle-polygon');
+  togglePolygon.off().on('click', () => {
+    if (!canToggle) {
+      return;
+    }
+    const toggleBtn = $('#map-toggle-polygon');
+    if (toggleBtn.hasClass('toggle-off')) {
+      toggleOn(toggleBtn);
+    } else {
+      toggleOff(toggleBtn);
+    }
+    return false;
+  });
+
   /////////////////
   // Draw a polygon
   const draw = new OlDraw({
     source: drawAPolygonSource,
     type: "Polygon",
+    stopClick: true,
   });
-  map.addInteraction(draw);
+
+  draw.on('drawstart', () => {
+    canToggle = false;
+    select.setActive(false);
+  });
+
+  draw.on('drawend', (evt: OlDrawEvent) => {
+    canToggle = true;
+    evt.preventDefault();
+    const geom = evt.feature.getGeometry();
+    if (geom) {
+      const extent : Extent = geom.getExtent();
+
+      // Go through each station that is inside the Extent (bounding box) and check
+      // for exact intersection with the actual geometry (to avoid false hits)
+      stationsLayer.getSource()?.forEachFeatureIntersectingExtent(extent, (f) => {
+        const fGeom = f.getGeometry();
+        if (fGeom && geom.intersectsExtent(fGeom.getExtent())) {
+          selectedFeatures.push(f);
+        }
+      });
+    }
+    
+    setTimeout(() => {select.setActive(true)}, 300);
+    setTimeout(() => {drawAPolygonSource.clear()}, 50);
+    toggleOff($('#map-toggle-polygon'));
+    showOrHideDownloadButton();
+  });
+
+  draw.on('drawabort', () => {
+    canToggle = true;
+    toggleOff($('#map-toggle-polygon'));
+    setTimeout(() => {select.setActive(true)}, 300);
+    // setTimeout(() => {drawAPolygonSource.clear()}, 50);
+  });
 
   return () => {map.setTarget(undefined)};
 }, []); };

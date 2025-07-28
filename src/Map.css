@@ -20,3 +20,47 @@
   visibility: hidden;
   pointer-events: none;
 }
+
+#map-download-btn {
+  position: absolute;
+  height: auto;
+  width: auto;
+  z-index: 90;
+  background-color: #555555;
+  color: #ff0000;
+  text-align: center;
+  border-radius: 4px;
+  padding: 5px;
+  left: 40px;
+  top: 10px;
+}
+
+#map-toggle-polygon {
+  position: absolute;
+  height: 30px;
+  width: 30px;
+  z-index: 90;
+  border-width: 3px;
+  border-radius: 4px;
+  text-align: center;
+  padding: 7px;
+  left: 10px;
+  top: 70px;
+  cursor: pointer;
+}
+
+.toggle-off {
+  background-color: #bbbbbb;
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.toggle-on {
+  background-color: #eeee33;
+  border-color: #ffff00;
+  color: #000000;
+}
+
+.hidden {
+    display:none;
+}
