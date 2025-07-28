@@ -89,7 +89,7 @@ export const useMap = () => { useEffect(() => {
   const mapTooltipElement = document.getElementById('map-tooltip')!;
 
   let currentFeature: OlFeatureLike | undefined;
-  let canToggle: boolean = true;
+  let canToggle = true;
 
   const featureText = (feature: OlFeatureLike) => {
     return `<strong>${feature.get("name") as string}</strong>
