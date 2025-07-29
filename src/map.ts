@@ -161,7 +161,11 @@ export const useMap = () => { useEffect(() => {
     if (numSelected === 0) {
       btn.hide();
     } else {
-      btn.html('Download Data for ' + String(numSelected) + ' Stations');
+      var stationText = 'Station';
+      if (numSelected != 1) {
+        stationText += 's';
+      }
+      btn.html(`Download Data for ${ String(numSelected) } ${ stationText }`);
       btn.show();
     }
   }
@@ -222,7 +226,6 @@ export const useMap = () => { useEffect(() => {
     canToggle = true;
     toggleOff($('#map-toggle-polygon'));
     setTimeout(() => {select.setActive(true)}, 300);
-    // setTimeout(() => {drawAPolygonSource.clear()}, 50);
   });
 
   return () => {map.setTarget(undefined)};
