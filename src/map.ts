@@ -161,8 +161,8 @@ export const useMap = () => { useEffect(() => {
     if (numSelected === 0) {
       btn.hide();
     } else {
-      var stationText = 'Station';
-      if (numSelected != 1) {
+      let stationText = 'Station';
+      if (numSelected !== 1) {
         stationText += 's';
       }
       btn.html(`Download Data for ${ String(numSelected) } ${ stationText }`);
