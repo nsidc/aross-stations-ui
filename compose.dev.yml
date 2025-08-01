@@ -1,5 +1,6 @@
 services:
   ui:
+    image: !reset null
     build:
       context: "."
       target: "builder"
