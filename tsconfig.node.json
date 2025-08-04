@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "./apps/aross-stations/",
+    "baseUrl": "./",
     "paths": {
       "@src/*": ["./src/*"]
     },
