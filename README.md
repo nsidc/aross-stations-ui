@@ -31,7 +31,16 @@ development, requires [NodeJS](https://nodejs.org/en) >=20.
 docker compose up --pull=always --detach
 ```
 
-Visit the running application at `http://localhost:80`.
+Visit the running application at `http://localhost:80/apps/aross-stations`.
+
+Note: This root was put in place to make it more condusive to hosting behind the NSIDC
+reverse proxies for the VMs.  If you want to use a different root, you can change it in
+the `vite.config.ts` file.
+
+Also, this app is currently configured to talk to the back-end API at the same server
+as this app, but using the `/api/aross-stations` root.  If this needs to be changed, do so
+in the `api.ts` file.  See `aross-stations-db` for details on how this is set up, particularly
+for local development.
 
 
 <!-- prettier-ignore-start -->
