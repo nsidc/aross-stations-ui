@@ -35,7 +35,8 @@ Visit the running application at `http://localhost:80/apps/aross-stations`.
 
 Note: This root was put in place to make it more condusive to hosting behind the NSIDC
 reverse proxies for the VMs.  If you want to use a different root, you can change it in
-the `vite.config.ts` file.
+the `vite.config.ts` file.  Also, when running in the `aross-stations-db` stack, it
+will be using HTTPS instead of HTTP.
 
 Also, this app is currently configured to talk to the back-end API at the same server
 as this app, but using the `/api/aross-stations` root.  If this needs to be changed, do so
