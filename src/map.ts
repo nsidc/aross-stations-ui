@@ -16,6 +16,8 @@ import OlView from 'ol/View.js';
 import type OlMapBrowserEvent from 'ol/MapBrowserEvent';
 import {type DrawEvent as OlDrawEvent} from 'ol/interaction/Draw';
 
+import $ from 'jquery';
+
 import { BASEMAP } from '@src/basemap';
 import { PROJECTION } from '@src/projection';
 import { API_STATIONS_QUERY_URL } from '@src/api';
@@ -154,24 +156,17 @@ export const useMap = () => { useEffect(() => {
   const selectedFeatures = select.getFeatures();
 
   const showOrHideDownloadButton = function() {
-    const btn : HTMLInputElement | null = document.querySelector('#map-download-btn');
-    
-    if (btn !== null) {
-      const numSelected = selectedFeatures.getLength();
-      if (numSelected === 0) {
-        btn.style.display = 'none';
-        // btn.hide();
-      } else {
-        let stationText = 'Station';
-        if (numSelected !== 1) {
-          stationText += 's';
-        }
-        const btnText = `Download Data for ${ String(numSelected) } ${ stationText }`;
-        // btn.html(`Download Data for ${ String(numSelected) } ${ stationText }`);
-        // btn.show();
-        btn.style.display = 'block';
-        btn.textContent = btnText;
+    const btn : JQuery = $('#map-download-btn');
+    const numSelected = selectedFeatures.getLength();
+    if (numSelected === 0) {
+      btn.hide();
+    } else {
+      let stationText = 'Station';
+      if (numSelected !== 1) {
+        stationText += 's';
       }
+      btn.html(`Download Data for ${ String(numSelected) } ${ stationText }`);
+      btn.show();
     }
   }
 
