@@ -12,7 +12,7 @@ export const Map = () => {
   return (
     <div id="map" style={{ width: '100vw', height: '100vh' }}>
       <div id="map-tooltip" />
-      <div id="map-download-btn" className="hidden">DOWNLOAD STUFF</div>
+      <div id="map-download-btn" className="hidden">DOWNLOAD</div>
       <div id="map-toggle-polygon" className="toggle-off">
         <img src={polyImg} />
       </div>
