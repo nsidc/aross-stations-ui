@@ -1,4 +1,4 @@
-FROM node:22 as builder
+FROM node:24 AS builder
 
 WORKDIR /app
 
@@ -24,3 +24,4 @@ CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 FROM nginx
 
 COPY --from=builder /app/dist /usr/share/nginx/html
+

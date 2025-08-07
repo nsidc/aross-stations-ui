@@ -2,5 +2,6 @@ services:
   ui:
     # TODO: Real tag
     image: "ghcr.io/nsidc/aross-stations-ui:latest"
+    container_name: "ui-standalone"
     ports:
       - "80:80"
