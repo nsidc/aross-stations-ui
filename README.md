@@ -33,7 +33,7 @@ docker compose up --pull=always --detach
 
 Visit the running application at `http://localhost:80/apps/aross-stations`.
 
-Note: This root was put in place to make it more condusive to hosting behind the NSIDC
+Note: This root was put in place to make it more conducive to hosting behind the NSIDC
 reverse proxies for the VMs.  If you want to use a different root, you can change it in
 the `vite.config.ts` file.  Also, when running in the `aross-stations-db` stack, it
 will be using HTTPS instead of HTTP.

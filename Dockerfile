@@ -24,3 +24,4 @@ CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 FROM nginx
 
 COPY --from=builder /app/dist /usr/share/nginx/html
+
