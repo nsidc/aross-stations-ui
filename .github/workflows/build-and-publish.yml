@@ -25,7 +25,8 @@ jobs:
 
   publish-to-npmjs:
     name: "Build & publish"
-    if: ${{ "startsWith(github.ref, 'refs/tags/v')" && false }}
+    # if : "startsWith(github.ref, 'refs/tags/v')"
+    if: false
     needs:
       - "test"
     runs-on: "ubuntu-latest"
