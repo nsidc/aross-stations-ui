@@ -9,7 +9,7 @@ services:
     restart: "on-failure"
     ports: !override
       # 5173 is Vite dev server's default port
-      - "80:5173"
+      - "5173:5173"
     volumes:
       - "./src:/app/src:ro"
       - "./index.html:/app/index.html:ro"
