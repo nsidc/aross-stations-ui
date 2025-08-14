@@ -107,7 +107,8 @@ export const useMap = () => { useEffect(() => {
         })
       }),
       geometry: (feature) => {
-        return new OlPoint(getCenter(feature.getGeometry()?.getExtent()));
+        // @ts-ignore - Typescript has issues with this line, but in this case Geometry will always have an Extent
+        return new OlPoint(getCenter(feature.getGeometry().getExtent()));
       }
     });
   };
