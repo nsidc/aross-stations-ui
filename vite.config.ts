@@ -7,10 +7,9 @@ import checker from 'vite-plugin-checker';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  // base: '/apps/aross-stations/',
   base: './',
   plugins: [
-    react(),
+    react({}),
 
     // We use this for "absolute imports":
     tsconfigPaths(),
@@ -23,4 +22,9 @@ export default defineConfig({
       },
     }),
   ],
+  server: {
+    fs: {
+      cachedChecks: false
+    }
+  }
 })

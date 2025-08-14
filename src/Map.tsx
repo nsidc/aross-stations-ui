@@ -1,4 +1,5 @@
 import 'ol/ol.css';
+import 'ol-ext/dist/ol-ext.css'
 
 import '@src/Map.css';
 import { useMap } from '@src/map';
@@ -16,6 +17,9 @@ export const Map = () => {
       <div id="map-toggle-polygon" className="toggle-off">
         <img src={polyImg} />
       </div>
+      {/* <div id="map-legend">
+        <div id="map-legend-title">LEGEND</div>
+      </div> */}
     </div>
   );
 };

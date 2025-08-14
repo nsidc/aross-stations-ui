@@ -10,11 +10,20 @@ import OlTileLayer from 'ol/layer/Tile';
 import {Pixel as OlPixel} from 'ol/pixel';
 import {FeatureLike as OlFeatureLike} from 'ol/Feature';
 import {Extent} from 'ol/extent';
+import {getCenter} from 'ol/extent.js';
 import OlVectorLayer from 'ol/layer/Vector';
 import OlVectorSource from 'ol/source/Vector'; 
 import OlView from 'ol/View.js';
+import Feature from 'ol/Feature.js';
+import {Style, Circle, Fill, Stroke, Text} from 'ol/style';
+import OlPoint from 'ol/geom/Point.js';
 import type OlMapBrowserEvent from 'ol/MapBrowserEvent';
 import {type DrawEvent as OlDrawEvent} from 'ol/interaction/Draw';
+
+import Legend from 'ol-ext/legend/Legend';
+import {default as LegendCtl} from 'ol-ext/control/Legend';
+
+import { hslaToRgba, interpolate, interpolateRgba } from './utils';
 
 import $ from 'jquery';
 
@@ -24,8 +33,14 @@ import { API_STATIONS_QUERY_URL, API_STATIONS_DATA_URL } from '@src/api';
 
 const EVENT_COUNT_FIELD_NAME = 'matching_rain_on_snow_event_count';
 const EVENT_SCALE_MIN = 10;
-const EVENT_SCALE_MAX = 1000;
+const EVENT_SCALE_MAX = 2000;
 const FILENAME_REGEX = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+const CIRCLE_STROKE_COLOR = 'hsl(0 100% 100% / 0.9)';
+const CIRCLE_STROKE_COLOR_RGBA = hslaToRgba(CIRCLE_STROKE_COLOR) ?? [0,0,0,1];
+const CIRCLE_FILL_COLOR_MIN = 'hsl(210 100% 40% / 0.9)';
+const CIRCLE_FILL_COLOR_MIN_RGBA = hslaToRgba(CIRCLE_FILL_COLOR_MIN) ?? [50,50,50,.5];
+const CIRCLE_FILL_COLOR_MAX = 'hsl(0 80% 60% / 0.9)';
+const CIRCLE_FILL_COLOR_MAX_RGBA = hslaToRgba(CIRCLE_FILL_COLOR_MAX) ?? [255,255,255,1];
 
 // Have ajax send array-type data using `x=1&&x=2` instead of `x[]=1&&x[]=2`,
 // as the backend does not expect the brackets.
@@ -38,6 +53,7 @@ export const useMap = () => { useEffect(() => {
     source: BASEMAP,
   });
 
+
   const stationsLayer = new OlVectorLayer({
     source: new OlVectorSource({
       format: new OlGeoJSON(),
@@ -45,25 +61,25 @@ export const useMap = () => { useEffect(() => {
     }),
     // @ts-ignore: Allow lists for circle-radius and circle-fill-color
     style: {
-      'circle-stroke-color': 'hsl(0 100% 100% / 0.9)',
+      'circle-stroke-color': CIRCLE_STROKE_COLOR,
       'circle-stroke-width': 0.75,
       'circle-radius': [
         'interpolate',
         ['linear'],
         ['get', EVENT_COUNT_FIELD_NAME],
         EVENT_SCALE_MIN,
-        3,
+        6,
         EVENT_SCALE_MAX,
-        10,
+        9,
       ],
       'circle-fill-color': [
         'interpolate',
         ['linear'],
         ['get', EVENT_COUNT_FIELD_NAME],
         EVENT_SCALE_MIN,
-        'hsl(210 100% 40% / 0.9)',
+        CIRCLE_FILL_COLOR_MIN,
         EVENT_SCALE_MAX,
-        'hsl(0 80% 60% / 0.9)',
+        CIRCLE_FILL_COLOR_MAX,
       ],
     },
   });
@@ -71,6 +87,61 @@ export const useMap = () => { useEffect(() => {
   const drawAPolygonSource = new OlVectorSource({wrapX: false});
   const drawAPolygonLayer = new OlVectorLayer({source: drawAPolygonSource});
 
+  const getLegendStyle = (feature: Feature): Style => {
+    const featureEventCount : number = feature.get(EVENT_COUNT_FIELD_NAME) as number;
+    return new Style({
+      image: new Circle({
+        radius: interpolate(featureEventCount, EVENT_SCALE_MIN, EVENT_SCALE_MAX, 6, 9),
+        fill: new Fill({
+          color: interpolateRgba(
+            featureEventCount,
+            EVENT_SCALE_MIN,
+            EVENT_SCALE_MAX,
+            CIRCLE_FILL_COLOR_MIN_RGBA,
+            CIRCLE_FILL_COLOR_MAX_RGBA
+          )
+        }),
+        stroke: new Stroke({
+          width: 0.75,
+          color: CIRCLE_STROKE_COLOR_RGBA
+        })
+      }),
+      geometry: (feature) => {
+        return new OlPoint(getCenter(feature.getGeometry()?.getExtent()));
+      }
+    });
+  };
+
+  
+  //////
+  // Legend
+  const legend = new Legend({
+    title: '# of Station Events',
+    // @ts-ignore - Typescript isn't getting the type for this assignment
+    style: getLegendStyle,
+    margin: 0,
+    titleStyle: new Text({
+      font: 'bold 24px sans-serif',
+      padding: [200, 50, 10, 50],
+    }),
+  });
+  const legendCtl = new LegendCtl({
+    legend: legend,
+    collapsed: false
+  });
+
+  // Add the sample "features" to the Legend
+  for (const legendValue of [1, 500, 1000, 1500, 2000]) {
+    let suffix = "";
+    if (legendValue === 2000) suffix = "+";
+
+    legend.addItem({
+    title: `${String(legendValue)}${suffix}`,
+    properties: { [EVENT_COUNT_FIELD_NAME] : legendValue },
+    typeGeom: 'Point',
+    height: 25,
+  });
+  }
 
   //////
   // Map
@@ -84,9 +155,9 @@ export const useMap = () => { useEffect(() => {
       zoom: 0,
       maxZoom: 4,
     }),
-    controls: defaultControls().extend([new MousePosition()]),
+    controls: defaultControls().extend([new MousePosition(), legendCtl]),
   }); 
-
+  
   //////////////////////////////////////////////////////////////////////
   // Tooltip code based on OpenLayers example:
   //     https://openlayers.org/en/latest/examples/tooltip-on-hover.html
@@ -104,7 +175,7 @@ export const useMap = () => { useEffect(() => {
     Matching rain on snow events: ${feature.get(EVENT_COUNT_FIELD_NAME) as string}`;
   };
 
-  const displayFeatureInfo = function (pixel: OlPixel, target: Element) {
+  const displayFeatureInfo = (pixel: OlPixel, target: Element) => {
     const feature = target.closest('.ol-control')
       ? undefined
       : map.forEachFeatureAtPixel(
@@ -161,7 +232,7 @@ export const useMap = () => { useEffect(() => {
   const selectedFeatures = select.getFeatures();
   const downloadBtn : JQuery = $('#map-download-btn');
 
-  const showOrHideDownloadButton = function() {
+  const showOrHideDownloadButton = () => {
     const numSelected = selectedFeatures.getLength();
     if (numSelected === 0) {
       downloadBtn.hide();
@@ -175,7 +246,7 @@ export const useMap = () => { useEffect(() => {
     }
   }
 
-  const extractAttachmentFilename = function(value: string | null) {
+  const extractAttachmentFilename = (value: string | null) => {
     let filename = null;
     if (value?.includes("attachment")) {
       const matches = FILENAME_REGEX.exec(value);
@@ -187,7 +258,7 @@ export const useMap = () => { useEffect(() => {
     return filename;
   }
 
-  const downloadDataForSelection = function() {
+  const downloadDataForSelection = () => {
     const selectedStations : string[] = [];
     selectedFeatures.forEach( (f) => {
       selectedStations.push(f.get('id') as string);
@@ -201,7 +272,7 @@ export const useMap = () => { useEffect(() => {
         end: '2024-01-01',
         stations: selectedStations
       },
-      success: function(data, _status, xhr) {
+      success: (data, _status, xhr) => {
         const blob = new Blob([data], { type: "text/csv" });
         const url = window.URL;
         const link = url.createObjectURL(blob);
@@ -211,7 +282,7 @@ export const useMap = () => { useEffect(() => {
         a.attr("href", link);
         a[0].click();
       },
-      error: function(_result, _status, err) {
+      error: (_result, _status, err) => {
         console.log(`Error loading data:\nERR: ${err}`);
       }
     });
