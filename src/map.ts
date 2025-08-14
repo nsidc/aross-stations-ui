@@ -20,11 +20,16 @@ import $ from 'jquery';
 
 import { BASEMAP } from '@src/basemap';
 import { PROJECTION } from '@src/projection';
-import { API_STATIONS_QUERY_URL } from '@src/api';
+import { API_STATIONS_QUERY_URL, API_STATIONS_DATA_URL } from '@src/api';
 
 const EVENT_COUNT_FIELD_NAME = 'matching_rain_on_snow_event_count';
 const EVENT_SCALE_MIN = 10;
 const EVENT_SCALE_MAX = 1000;
+const FILENAME_REGEX = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+
+// Have ajax send array-type data using `x=1&&x=2` instead of `x[]=1&&x[]=2`,
+// as the backend does not expect the brackets.
+$.ajaxSetup({ traditional: true });
 
 export const useMap = () => { useEffect(() => {
   /////////
@@ -154,26 +159,71 @@ export const useMap = () => { useEffect(() => {
   map.addInteraction(select);
 
   const selectedFeatures = select.getFeatures();
+  const downloadBtn : JQuery = $('#map-download-btn');
 
   const showOrHideDownloadButton = function() {
-    const btn : JQuery = $('#map-download-btn');
     const numSelected = selectedFeatures.getLength();
     if (numSelected === 0) {
-      btn.hide();
+      downloadBtn.hide();
     } else {
       let stationText = 'Station';
       if (numSelected !== 1) {
         stationText += 's';
       }
-      btn.html(`Download Data for ${ String(numSelected) } ${ stationText }`);
-      btn.show();
+      downloadBtn.html(`Download Data for ${ String(numSelected) } ${ stationText }`);
+      downloadBtn.show();
     }
   }
 
+  const extractAttachmentFilename = function(value: string | null) {
+    let filename = null;
+    if (value?.includes("attachment")) {
+      const matches = FILENAME_REGEX.exec(value);
+      if (matches?.[1]) {
+        filename = matches[1].replace(/['"]/g, '');
+      }
+    }
+
+    return filename;
+  }
+
+  const downloadDataForSelection = function() {
+    const selectedStations : string[] = [];
+    selectedFeatures.forEach( (f) => {
+      selectedStations.push(f.get('id') as string);
+    });
+
+    void $.ajax({
+      type: "POST",
+      url: API_STATIONS_DATA_URL,
+      data: {
+        start: '2000-01-01',
+        end: '2024-01-01',
+        stations: selectedStations
+      },
+      success: function(data, _status, xhr) {
+        const blob = new Blob([data], { type: "text/csv" });
+        const url = window.URL;
+        const link = url.createObjectURL(blob);
+        const disposition = xhr.getResponseHeader('content-disposition');
+        const a = $("<a />");
+        a.attr("download", extractAttachmentFilename(disposition) ?? 'station_data.csv');
+        a.attr("href", link);
+        a[0].click();
+      },
+      error: function(_result, _status, err) {
+        console.log(`Error loading data:\nERR: ${err}`);
+      }
+    });
+  }
+
+  // Do "off" then "on" to ensure the listener isn't attached twice for some reason
+  downloadBtn.off().on('click', downloadDataForSelection)
+
   select.on('select', showOrHideDownloadButton);
 
-  const togglePolygon = $('#map-toggle-polygon');
-  togglePolygon.off().on('click', () => {
+  const togglePolygonBtn = $('#map-toggle-polygon');
+  togglePolygonBtn.off().on('click', () => {
     if (!canToggle) {
       return;
     }
