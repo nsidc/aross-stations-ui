@@ -17,9 +17,6 @@ export const Map = () => {
       <div id="map-toggle-polygon" className="toggle-off">
         <img src={polyImg} />
       </div>
-      {/* <div id="map-legend">
-        <div id="map-legend-title">LEGEND</div>
-      </div> */}
     </div>
   );
 };
