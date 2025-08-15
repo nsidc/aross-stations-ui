@@ -1,4 +1,5 @@
 import 'ol/ol.css';
+import 'ol-ext/dist/ol-ext.css'
 
 import '@src/Map.css';
 import { useMap } from '@src/map';
