@@ -33,13 +33,13 @@ import { API_STATIONS_QUERY_URL, API_STATIONS_DATA_URL } from '@src/api';
 
 const EVENT_COUNT_FIELD_NAME = 'matching_rain_on_snow_event_count';
 const EVENT_SCALE_MIN = 10;
-const EVENT_SCALE_MAX = 2000;
+const EVENT_SCALE_MAX = 1500;
 const FILENAME_REGEX = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
 const CIRCLE_STROKE_COLOR = 'hsl(0 100% 100% / 0.9)';
 const CIRCLE_STROKE_COLOR_RGBA = hslaToRgba(CIRCLE_STROKE_COLOR) ?? [0,0,0,1];
-const CIRCLE_FILL_COLOR_MIN = 'hsl(210 100% 40% / 0.9)';  // BLUE
+const CIRCLE_FILL_COLOR_MIN = 'hsl(229 100% 24% / 0.9)';  // BLUE
 const CIRCLE_FILL_COLOR_MIN_RGBA = hslaToRgba(CIRCLE_FILL_COLOR_MIN) ?? [50,50,50,.5];
-const CIRCLE_FILL_COLOR_MAX = 'hsl(0 80% 60% / 0.9)';  // RED
+const CIRCLE_FILL_COLOR_MAX = 'hsl(180 100% 49% / 0.9)';  // CYAN
 const CIRCLE_FILL_COLOR_MAX_RGBA = hslaToRgba(CIRCLE_FILL_COLOR_MAX) ?? [255,255,255,1];
 
 // Have ajax send array-type data using `x=1&&x=2` instead of `x[]=1&&x[]=2`,
