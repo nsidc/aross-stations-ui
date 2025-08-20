@@ -14,15 +14,18 @@ export const Map = () => {
   return (
     <div id="map" style={{ width: '100vw', height: '100vh' }}>
 
+      {/* This "covers" the rest of the screen so that things cannot be clicked while
+      the dialog box is open */}
       <div id="dialog-modality"></div>
-      
+
+      {/* A dialog box which will pop up when downloading a plot. */}
       <div id="plot-dialog" className="dialog-content">
         <div id="plot-dialog-close" className="dialog-close-btn">
           &times;
         </div>
         <h3 id="plot-dialog-header">Time Series Plot</h3>
-        <div id="plot-dialog-image">HERE IS WHERE IT GOES</div>
-        <div id="plot-dialog-link">link...</div>
+        <div id="plot-dialog-image"></div>
+        <div id="plot-dialog-link"></div>
       </div>
       
       <div id="map-tooltip" />
