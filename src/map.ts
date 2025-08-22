@@ -322,12 +322,14 @@ export const useMap = () => { useEffect(() => {
       selectedStations.push(f.get('id') as string);
     });
 
+    const [startDate, endDate] : string[] = currentStartEndDates();
+
     void $.ajax({
       type: "POST",
       url: API_STATIONS_DATA_URL,
       data: {
-        start: DEFAULT_STARTDATE,
-        end: DEFAULT_ENDDATE,
+        start: startDate,
+        end: endDate,
         stations: selectedStations
       },
       success: (data, _status, xhr) => {
@@ -358,12 +360,14 @@ export const useMap = () => { useEffect(() => {
     plotDialogImgDiv.empty();
     plotDialogLinkDiv.attr("href", "javascript:");
 
+    const [startDate, endDate] : string[] = currentStartEndDates();
+
     void $.ajax({
       type: "POST",
       url: API_STATIONS_TIMESERIES_URL,
       data: {
-        start: DEFAULT_STARTDATE,
-        end: DEFAULT_ENDDATE,
+        start: startDate,
+        end: endDate,
         stations: selectedStations
       },
       xhr: () => {
