@@ -29,17 +29,21 @@ import $ from 'jquery';
 
 import { BASEMAP } from '@src/basemap';
 import { PROJECTION } from '@src/projection';
-import { API_STATIONS_QUERY_URL, API_STATIONS_DATA_URL } from '@src/api';
+import { 
+  API_STATIONS_QUERY_URL,
+  API_STATIONS_DATA_URL,
+  API_STATIONS_TIMESERIES_URL
+} from '@src/api';
 
 const EVENT_COUNT_FIELD_NAME = 'matching_rain_on_snow_event_count';
 const EVENT_SCALE_MIN = 10;
-const EVENT_SCALE_MAX = 2000;
+const EVENT_SCALE_MAX = 1500;
 const FILENAME_REGEX = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
 const CIRCLE_STROKE_COLOR = 'hsl(0 100% 100% / 0.9)';
 const CIRCLE_STROKE_COLOR_RGBA = hslaToRgba(CIRCLE_STROKE_COLOR) ?? [0,0,0,1];
-const CIRCLE_FILL_COLOR_MIN = 'hsl(210 100% 40% / 0.9)';  // BLUE
+const CIRCLE_FILL_COLOR_MIN = 'hsl(229 100% 24% / 0.9)';  // BLUE
 const CIRCLE_FILL_COLOR_MIN_RGBA = hslaToRgba(CIRCLE_FILL_COLOR_MIN) ?? [50,50,50,.5];
-const CIRCLE_FILL_COLOR_MAX = 'hsl(0 80% 60% / 0.9)';  // RED
+const CIRCLE_FILL_COLOR_MAX = 'hsl(180 100% 49% / 0.9)';  // CYAN
 const CIRCLE_FILL_COLOR_MAX_RGBA = hslaToRgba(CIRCLE_FILL_COLOR_MAX) ?? [255,255,255,1];
 
 // Have ajax send array-type data using `x=1&&x=2` instead of `x[]=1&&x[]=2`,
@@ -132,10 +136,10 @@ export const useMap = () => { useEffect(() => {
   });
 
   // Add the sample "features" to the Legend
-  const LEGEND_VALUES = [1, 500, 1000, 1500, 2000];
+  const LEGEND_VALUES = [1, 500, 1000, 1500];
   for (const legendValue of LEGEND_VALUES) {
     let suffix = "";
-    if (legendValue === 2000) suffix = "+";
+    if (legendValue === 1500) suffix = "+";
 
     legend.addItem({
     title: `${String(legendValue)}${suffix}`,
@@ -144,6 +148,16 @@ export const useMap = () => { useEffect(() => {
     height: 25,
   });
   }
+
+  //////
+  // Dialog
+  const plotDialog = $('#plot-dialog');
+  const plotModality = $('#dialog-modality');
+  const togglePlotDialog = () => {
+    plotDialog.toggle();
+    plotModality.toggle();
+  }
+  $('#plot-dialog-close').off().on('click', togglePlotDialog);
 
   //////
   // Map
@@ -209,6 +223,7 @@ export const useMap = () => { useEffect(() => {
     displayFeatureInfo(pixel, evt.originalEvent.target as Element);
   });
 
+
   ////////////////////////
   // Toggle Polygon Button
   const toggleOn = (btn: JQuery) => {
@@ -233,18 +248,23 @@ export const useMap = () => { useEffect(() => {
 
   const selectedFeatures = select.getFeatures();
   const downloadBtn : JQuery = $('#map-download-btn');
+  const timeseriesBtn : JQuery = $('#map-timeseries-btn');
 
-  const showOrHideDownloadButton = () => {
+  const ShowOrHideDataButtons = () => {
     const numSelected = selectedFeatures.getLength();
     if (numSelected === 0) {
       downloadBtn.hide();
+      timeseriesBtn.hide();
     } else {
       let stationText = 'Station';
       if (numSelected !== 1) {
         stationText += 's';
       }
-      downloadBtn.html(`Download Data for ${ String(numSelected) } ${ stationText }`);
+      downloadBtn.attr('title', `Download Data for ${String(numSelected)} ${stationText}`);
       downloadBtn.show();
+
+      timeseriesBtn.attr('title', `Plot Rain-on-Snow Time Series for ${String(numSelected)} ${stationText}`)
+      timeseriesBtn.show();
     }
   }
 
@@ -290,10 +310,60 @@ export const useMap = () => { useEffect(() => {
     });
   }
 
-  // Do "off" then "on" to ensure the listener isn't attached twice for some reason
-  downloadBtn.off().on('click', downloadDataForSelection)
+  const plotDialogImgDiv = $('#plot-dialog-image');
+  const plotDialogLinkDiv = $('#plot-dialog-link');
 
-  select.on('select', showOrHideDownloadButton);
+  const createTimeseriesPlot = () => {
+    const selectedStations : string[] = [];
+    selectedFeatures.forEach( (f) => {
+      selectedStations.push(f.get('id') as string);
+    });
+
+    plotDialogImgDiv.empty();
+    plotDialogLinkDiv.attr("href", "javascript:");
+
+    void $.ajax({
+      type: "POST",
+      url: API_STATIONS_TIMESERIES_URL,
+      data: {
+        start: '2000-01-01',
+        end: '2024-01-01',
+        stations: selectedStations
+      },
+      xhr: () => {
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = 'blob';
+        return xhr;
+      },
+      success: (data, _status, xhr) => {
+        const blob = new Blob([data], { type: "image/png" });
+        const url = window.URL;
+        const link = url.createObjectURL(blob);
+        const image = new Image();
+        image.src = link;
+
+        plotDialogImgDiv.empty().append(image);
+        
+        const a = $("<a>Download this plot</a>");
+        const disposition = xhr.getResponseHeader('content-disposition');
+        a.attr("download", extractAttachmentFilename(disposition) ?? 'station_plot.png');
+        a.attr("href", link);
+        
+        plotDialogLinkDiv.empty().append(a);
+
+        togglePlotDialog();
+      },
+      error: (_result, _status, err) => {
+        console.log(`Error loading timeseries plot\nERR: ${err}`);
+      }
+    });
+  };
+
+  // Do "off" then "on" to ensure the listener isn't attached twice (not sure why this happens)
+  downloadBtn.off().on('click', downloadDataForSelection);
+  timeseriesBtn.off().on('click', createTimeseriesPlot);
+
+  select.on('select', ShowOrHideDataButtons);
 
   const togglePolygonBtn = $('#map-toggle-polygon');
   togglePolygonBtn.off().on('click', () => {
@@ -342,7 +412,7 @@ export const useMap = () => { useEffect(() => {
     setTimeout(() => {select.setActive(true)}, 300);
     setTimeout(() => {drawAPolygonSource.clear()}, 50);
     toggleOff($('#map-toggle-polygon'));
-    showOrHideDownloadButton();
+    ShowOrHideDataButtons();
   });
 
   draw.on('drawabort', () => {
