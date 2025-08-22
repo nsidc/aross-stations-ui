@@ -117,3 +117,17 @@
   z-index: 99;
   display: none;
 }
+
+#datepicker-container {
+  position: absolute;
+  height: auto;
+  width: auto;
+  z-index: 90;
+  left: 10px;
+  top: 130px;
+  background-color: moccasin;
+}
+
+.react-datepicker__input-container input {
+  width: 70px;
+}

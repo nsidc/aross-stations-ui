@@ -35,10 +35,13 @@ import {
   API_STATIONS_TIMESERIES_URL
 } from '@src/api';
 
+const DEFAULT_STARTDATE = '2000-01-01';
+const DEFAULT_ENDDATE = '2024-12-31';
 const EVENT_COUNT_FIELD_NAME = 'matching_rain_on_snow_event_count';
 const EVENT_SCALE_MIN = 10;
 const EVENT_SCALE_MAX = 1500;
 const FILENAME_REGEX = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+const DATE_REGEX = /\d{4}-\d{2}-\d{2}/;
 const CIRCLE_STROKE_COLOR = 'hsl(0 100% 100% / 0.9)';
 const CIRCLE_STROKE_COLOR_RGBA = hslaToRgba(CIRCLE_STROKE_COLOR) ?? [0,0,0,1];
 const CIRCLE_FILL_COLOR_MIN = 'hsl(229 100% 24% / 0.9)';  // BLUE
@@ -50,6 +53,8 @@ const CIRCLE_FILL_COLOR_MAX_RGBA = hslaToRgba(CIRCLE_FILL_COLOR_MAX) ?? [255,255
 // as the backend does not expect the brackets.
 $.ajaxSetup({ traditional: true });
 
+export let dateChangeCallback : () => void;
+
 export const useMap = () => { useEffect(() => {
   /////////
   // Layers
@@ -57,11 +62,25 @@ export const useMap = () => { useEffect(() => {
     source: BASEMAP,
   });
 
+  const apiStationUrl = (startdate = DEFAULT_STARTDATE, enddate = DEFAULT_ENDDATE) => {
+    const startClean = DATE_REGEX.exec(startdate) ?? [DEFAULT_STARTDATE];
+    const endClean = DATE_REGEX.exec(enddate) ?? [DEFAULT_ENDDATE];
+
+    const newUrl = `${API_STATIONS_QUERY_URL}?start=${startClean[0]}&&end=${endClean[0]}`;
+    return newUrl;
+  }
+
+  const currentStartEndDates = () : string[] => {
+    const newStart = $('#date-start').val()?.toString() ?? DEFAULT_STARTDATE;
+    const newEnd = $('#date-end').val()?.toString() ?? DEFAULT_ENDDATE;
+
+    return [newStart, newEnd];
+  }
 
   const stationsLayer = new OlVectorLayer({
     source: new OlVectorSource({
       format: new OlGeoJSON(),
-      url: API_STATIONS_QUERY_URL,
+      url: apiStationUrl(),
     }),
     // @ts-ignore: Allow lists for circle-radius and circle-fill-color
     style: {
@@ -245,6 +264,23 @@ export const useMap = () => { useEffect(() => {
   });
 
   map.addInteraction(select);
+  
+  const togglePolygonBtn = $('#map-toggle-polygon');
+  togglePolygonBtn.off().on('click', () => {
+    if (!canToggle) {
+      return;
+    }
+    const toggleBtn = $('#map-toggle-polygon');
+    if (toggleBtn.hasClass('toggle-off')) {
+      toggleOn(toggleBtn);
+    } else {
+      toggleOff(toggleBtn);
+    }
+    return false;
+  });
+
+  ////////////////////////////
+  // Download and Plot Buttons
 
   const selectedFeatures = select.getFeatures();
   const downloadBtn : JQuery = $('#map-download-btn');
@@ -290,8 +326,8 @@ export const useMap = () => { useEffect(() => {
       type: "POST",
       url: API_STATIONS_DATA_URL,
       data: {
-        start: '2000-01-01',
-        end: '2024-01-01',
+        start: DEFAULT_STARTDATE,
+        end: DEFAULT_ENDDATE,
         stations: selectedStations
       },
       success: (data, _status, xhr) => {
@@ -326,8 +362,8 @@ export const useMap = () => { useEffect(() => {
       type: "POST",
       url: API_STATIONS_TIMESERIES_URL,
       data: {
-        start: '2000-01-01',
-        end: '2024-01-01',
+        start: DEFAULT_STARTDATE,
+        end: DEFAULT_ENDDATE,
         stations: selectedStations
       },
       xhr: () => {
@@ -365,22 +401,20 @@ export const useMap = () => { useEffect(() => {
 
   select.on('select', ShowOrHideDataButtons);
 
-  const togglePolygonBtn = $('#map-toggle-polygon');
-  togglePolygonBtn.off().on('click', () => {
-    if (!canToggle) {
-      return;
-    }
-    const toggleBtn = $('#map-toggle-polygon');
-    if (toggleBtn.hasClass('toggle-off')) {
-      toggleOn(toggleBtn);
-    } else {
-      toggleOff(toggleBtn);
-    }
-    return false;
-  });
+
+  // Update visible stations when date is updated
+  dateChangeCallback = () => {
+    const [newStart, newEnd] : string[] = currentStartEndDates();
+      
+    stationsLayer.getSource()?.setUrl(apiStationUrl(newStart, newEnd));
+    stationsLayer.getSource()?.refresh();
+  }
+
+
 
   /////////////////
   // Draw a polygon
+
   const draw = new OlDraw({
     source: drawAPolygonSource,
     type: "Polygon",
