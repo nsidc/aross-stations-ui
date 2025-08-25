@@ -169,14 +169,24 @@ export const useMap = () => { useEffect(() => {
   }
 
   //////
-  // Dialog
+  // Dialogs
+  const dialogModality = $('#dialog-modality');
+  
+
   const plotDialog = $('#plot-dialog');
-  const plotModality = $('#dialog-modality');
   const togglePlotDialog = () => {
     plotDialog.toggle();
-    plotModality.toggle();
+    dialogModality.toggle();
   }
   $('#plot-dialog-close').off().on('click', togglePlotDialog);
+
+  const guideDialog = $('#guide-dialog');
+  const toggleGuideDialog = () => {
+    guideDialog.toggle();
+    dialogModality.toggle();
+  }
+  $('#guide-dialog-close').off().on('click', toggleGuideDialog);
+  $('#guide-toggle-btn').off().on('click', toggleGuideDialog);
 
   //////
   // Map

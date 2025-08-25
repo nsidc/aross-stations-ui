@@ -8,6 +8,7 @@ import { useMap, dateChangeCallback } from '@src/map';
 import polyImg from '@src/assets/draw-polygon_1.svg';
 import downloadImg from '@src/assets/download-data.svg';
 import timeseriesImg from '@src/assets/bar-chart.svg';
+import guideImg from '@src/assets/question-mark.svg';
 
 import { useEffect, useState } from "react";
 import DatePicker from 'react-datepicker';
@@ -33,7 +34,7 @@ export const Map = () => {
       <div id="dialog-modality"></div>
 
       {/* A dialog box which will pop up when downloading a plot. */}
-      <div id="plot-dialog" className="dialog-content">
+      <div id="plot-dialog" className="plot-dialog-layout">
         <div id="plot-dialog-close" className="dialog-close-btn">
           &times;
         </div>
@@ -41,8 +42,24 @@ export const Map = () => {
         <div id="plot-dialog-image"></div>
         <div id="plot-dialog-link"></div>
       </div>
+
+      {/* A dialog box for displaying user guide information. */}
+      <div id="guide-dialog" className="guide-dialog-layout">
+        <div id="guide-dialog-close" className="dialog-close-btn">
+          &times;
+        </div>
+        <h3 id="guide-dialog-header">User Guide</h3>
+        <div id="guide-dialog-content">This is where the guide will go</div>
+      </div>
+
+      <div id="guide-toggle-btn" className="guideButton">
+        <img src={guideImg} />
+      </div>      
       
+      {/* Mouseover tooltip for stations */}
       <div id="map-tooltip" />
+            
+      {/* Buttons for downloading data and generating plots */}
       <div id="map-download-btn" className="hidden dataButton">
         <img src={downloadImg} />
       </div>
@@ -50,7 +67,12 @@ export const Map = () => {
         <img src={timeseriesImg} />
       </div>
 
-      {/* @ts-ignore: don't worry about it */}
+      {/* Draw Polygon selection toggle */}
+      <div id="map-toggle-polygon" className="toggle-off" title="Draw Polygon to Select Stations">
+        <img src={polyImg} />
+      </div>
+
+      {/* Datepicker control */}
       <div id="datepicker-container">
         <div>
           <DatePicker
@@ -82,10 +104,6 @@ export const Map = () => {
             maxDate={new Date()}
           />
         </div>
-      </div>
-
-      <div id="map-toggle-polygon" className="toggle-off" title="Draw Polygon to Select Stations">
-        <img src={polyImg} />
       </div>
       
     </div>
