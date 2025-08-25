@@ -16,7 +16,7 @@ export const Map = () => {
   useMap();
 
   const DEFAULT_START = new Date('2000/01/01');
-  const DEFAULT_END = new Date('2024/12/31');
+  const DEFAULT_END = new Date();
 
   const [startDate, setStartDate] = useState(DEFAULT_START);
   const [endDate, setEndDate] = useState(DEFAULT_END);

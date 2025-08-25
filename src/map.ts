@@ -23,7 +23,7 @@ import {type DrawEvent as OlDrawEvent} from 'ol/interaction/Draw';
 import Legend from 'ol-ext/legend/Legend';
 import {default as LegendCtl} from 'ol-ext/control/Legend';
 
-import { hslaToRgba, interpolate, interpolateRgba } from './utils';
+import { hslaToRgba, interpolate, interpolateRgba, dateToYYYYMMDD } from './utils';
 
 import $ from 'jquery';
 
@@ -36,7 +36,7 @@ import {
 } from '@src/api';
 
 const DEFAULT_STARTDATE = '2000-01-01';
-const DEFAULT_ENDDATE = '2024-12-31';
+const DEFAULT_ENDDATE = dateToYYYYMMDD(new Date());
 const EVENT_COUNT_FIELD_NAME = 'matching_rain_on_snow_event_count';
 const EVENT_SCALE_MIN = 10;
 const EVENT_SCALE_MAX = 1500;
