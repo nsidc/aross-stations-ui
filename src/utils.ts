@@ -91,3 +91,16 @@ export const interpolateRgba = function(
   const a = interpolate(value, minData, maxData, startColor[3], endColor[3]);
   return [r,g,b,a];
 }
+
+
+export const dateToYYYYMMDD = function(date: Date): string {
+  const toString = (date: number, padLength: number) => {
+    return date.toString().padStart(padLength, '0');
+  };
+
+  const dateStr = toString(date.getFullYear(), 4) + '-' +
+                  toString(date.getMonth() + 1, 2) + '-' +
+                  toString(date.getDate() + 1, 2);
+
+  return dateStr;
+}
