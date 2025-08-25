@@ -49,7 +49,38 @@ export const Map = () => {
           &times;
         </div>
         <h3 id="guide-dialog-header">User Guide</h3>
-        <div id="guide-dialog-content">This is where the guide will go</div>
+        <div id="guide-dialog-content">
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+            <p>This is where the guide will go</p>
+        </div>
       </div>
 
       <div id="guide-toggle-btn" className="guideButton">

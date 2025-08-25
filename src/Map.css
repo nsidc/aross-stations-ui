@@ -135,9 +135,15 @@
   font-size: 1.5em;
   font-weight: bolder;
   width: auto;
+  height: 35px;
   padding: 5px;
   margin: 13px 0px 0px 0px;
   background-color: grey;
+}
+
+#guide-dialog-content {
+  overflow-y: auto;
+  height: calc(100% - 50px);
 }
 
 .dialog-close-btn {
