@@ -7,7 +7,9 @@ import { useMap, dateChangeCallback } from '@src/map';
 
 import polyImg from '@src/assets/draw-polygon_1.svg';
 import downloadImg from '@src/assets/download-data.svg';
-import timeseriesImg from '@src/assets/bar-chart.svg';
+import barchartImg from '@src/assets/bar-chart.svg';
+import linechartImg from '@src/assets/line-chart.svg';
+
 
 import { useEffect, useState } from "react";
 import DatePicker from 'react-datepicker';
@@ -37,7 +39,7 @@ export const Map = () => {
         <div id="plot-dialog-close" className="dialog-close-btn">
           &times;
         </div>
-        <h3 id="plot-dialog-header">Time Series Plot</h3>
+        <h3 id="plot-dialog-header">Plot</h3>
         <div id="plot-dialog-image"></div>
         <div id="plot-dialog-link"></div>
       </div>
@@ -47,7 +49,10 @@ export const Map = () => {
         <img src={downloadImg} />
       </div>
       <div id="map-timeseries-btn" className="hidden dataButton">
-        <img src={timeseriesImg} />
+        <img src={linechartImg} />
+      </div>
+      <div id="map-totals-btn" className="hidden dataButton">
+        <img src={barchartImg} />
       </div>
 
       {/* @ts-ignore: don't worry about it */}

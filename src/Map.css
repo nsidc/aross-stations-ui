@@ -43,6 +43,10 @@
   left: 100px;
 }
 
+#map-totals-btn {
+  left: 150px;
+}
+
 .dataButton img {
   height: 35px;
   width: 35px;
