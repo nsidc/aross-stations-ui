@@ -32,7 +32,8 @@ import { PROJECTION } from '@src/projection';
 import { 
   API_STATIONS_QUERY_URL,
   API_STATIONS_DATA_URL,
-  API_STATIONS_TIMESERIES_URL
+  API_STATIONS_TIMESERIES_URL,
+  API_STATIONS_TOTALS_URL,
 } from '@src/api';
 
 const DEFAULT_STARTDATE = '2000-01-01';
@@ -285,12 +286,14 @@ export const useMap = () => { useEffect(() => {
   const selectedFeatures = select.getFeatures();
   const downloadBtn : JQuery = $('#map-download-btn');
   const timeseriesBtn : JQuery = $('#map-timeseries-btn');
+  const totalsBtn : JQuery = $('#map-totals-btn');
 
   const ShowOrHideDataButtons = () => {
     const numSelected = selectedFeatures.getLength();
     if (numSelected === 0) {
       downloadBtn.hide();
       timeseriesBtn.hide();
+      totalsBtn.hide();
     } else {
       let stationText = 'Station';
       if (numSelected !== 1) {
@@ -301,6 +304,9 @@ export const useMap = () => { useEffect(() => {
 
       timeseriesBtn.attr('title', `Plot Rain-on-Snow Time Series for ${String(numSelected)} ${stationText}`)
       timeseriesBtn.show();
+
+      totalsBtn.attr('title', `Rain-on-Snow Event Totals by month for ${String(numSelected)} ${stationText}`)
+      totalsBtn.show();
     }
   }
 
@@ -348,6 +354,7 @@ export const useMap = () => { useEffect(() => {
     });
   }
 
+  const plotDialogHeaderDiv = $('#plot-dialog-header');
   const plotDialogImgDiv = $('#plot-dialog-image');
   const plotDialogLinkDiv = $('#plot-dialog-link');
 
@@ -382,6 +389,8 @@ export const useMap = () => { useEffect(() => {
         const image = new Image();
         image.src = link;
 
+        plotDialogHeaderDiv.html('Time Series Plot');
+
         plotDialogImgDiv.empty().append(image);
         
         const a = $("<a>Download this plot</a>");
@@ -399,9 +408,60 @@ export const useMap = () => { useEffect(() => {
     });
   };
 
+  const createTotalsPlot = () => {
+    const selectedStations : string[] = [];
+    selectedFeatures.forEach( (f) => {
+      selectedStations.push(f.get('id') as string);
+    });
+
+    plotDialogImgDiv.empty();
+    plotDialogLinkDiv.attr("href", "javascript:");
+
+    const [startDate, endDate] : string[] = currentStartEndDates();
+
+    void $.ajax({
+      type: "POST",
+      url: API_STATIONS_TOTALS_URL,
+      data: {
+        start: startDate,
+        end: endDate,
+        stations: selectedStations
+      },
+      xhr: () => {
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = 'blob';
+        return xhr;
+      },
+      success: (data, _status, xhr) => {
+        const blob = new Blob([data], { type: "image/png" });
+        const url = window.URL;
+        const link = url.createObjectURL(blob);
+        const image = new Image();
+        image.src = link;
+
+        plotDialogHeaderDiv.html('Events By Month Plot');
+
+        plotDialogImgDiv.empty().append(image);
+        
+        const a = $("<a>Download this plot</a>");
+        const disposition = xhr.getResponseHeader('content-disposition');
+        a.attr("download", extractAttachmentFilename(disposition) ?? 'station_plot.png');
+        a.attr("href", link);
+        
+        plotDialogLinkDiv.empty().append(a);
+
+        togglePlotDialog();
+      },
+      error: (_result, _status, err) => {
+        console.log(`Error loading totals plot\nERR: ${err}`);
+      }
+    });
+  };
+
   // Do "off" then "on" to ensure the listener isn't attached twice (not sure why this happens)
   downloadBtn.off().on('click', downloadDataForSelection);
   timeseriesBtn.off().on('click', createTimeseriesPlot);
+  totalsBtn.off().on('click', createTotalsPlot);
 
   select.on('select', ShowOrHideDataButtons);
 
