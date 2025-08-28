@@ -150,6 +150,10 @@
   height: calc(100% - 50px);
 }
 
+#guide-dialog-content img {
+  margin-left: 5px;
+}
+
 .dialog-close-btn {
   position: absolute;
   right: 20px;

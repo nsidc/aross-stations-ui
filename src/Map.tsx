@@ -57,12 +57,10 @@ export const Map = () => {
               more stations, displaying time-series and climatology plots of the data, and downloading data for
               selected points.  The database and this web application were built at part of the Arctic Rain on
               Snow Study (AROSS) funded by the National Science Foundations Navigating the New Arctic program
-            </p>
-            <p>
-              <a href="https://nsf.gov/awardsearch/showAward?AWD_ID=1928230">
+              (<a href="https://nsf.gov/awardsearch/showAward?AWD_ID=1928230">
                 <img src="https://img.shields.io/badge/NSF-1928230-red.svg" 
                      alt="National Science Foundation Award: 1928230" />
-              </a>.
+              </a>).
             </p>
             <p>
               The database is built from reports from automatic weather stations in Arctic regions of North
@@ -98,6 +96,8 @@ export const Map = () => {
             </p>
             <p>
               <b>Download</b> selected data by clicking on <img src={downloadImg} alt="Download icon" width="20px" />.
+              The data will be returned as a CSV file containing all events for the selected station within the time
+              range. Note: Events that are NOT &quot;rain-on-snow&quot; events will also be returned for completeness.
             </p>
             <p>
               A time series of events for selected stations can be plotted by clicking
@@ -168,7 +168,6 @@ export const Map = () => {
           />
         </div>
       </div>
-      
     </div>
   );
 };
