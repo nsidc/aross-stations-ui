@@ -55,21 +55,21 @@
 .guideButton {
   cursor: pointer;
   position: absolute;
-  height: 20px;
-  width: 20px;
+  height: 35px;
+  width: 35px;
   z-index: 90;
   background-color: lightgoldenrodyellow;
   color: black;
   text-align: center;
-  border-radius: 4px;
+  border-radius: 9px;
   padding: 5px;
   bottom: 20px;
   right: 20px;
 }
 
 .guideButton img {
-  height: 20px;
-  width: 20px;
+  height: 35px;
+  width: 35px;
 }
 
 #map-toggle-polygon {
